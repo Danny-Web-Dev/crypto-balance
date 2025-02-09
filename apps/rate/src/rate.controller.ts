@@ -1,12 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { RateService } from './rate.service';
 
-@Controller()
+@Controller('rates')
 export class RateController {
-  constructor(private readonly rateServiceService: RateService) {}
+  constructor(private readonly rateService: RateService) {}
 
   @Get()
-  getHello(): string {
-    return this.rateServiceService.getHello();
+  async getCryptoRates(): Promise<string> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return await this.rateService.getCryptoRates(['1']);
   }
 }

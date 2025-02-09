@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { RateController } from './rate.controller';
 import { RateService } from './rate.service';
+import { RateController } from './rate.controller';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true })],
+  imports: [HttpModule, ConfigModule],
   controllers: [RateController],
   providers: [RateService],
 })

@@ -1,40 +1,30 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/crypto-balance/src",
+  "sourceRoot": "apps/rate/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/crypto-balance/tsconfig.app.json"
+    "tsConfigPath": "apps/rate/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/crypto-balance",
   "projects": {
-    "balance-service": {
+    "balance": {
       "type": "application",
-      "root": "apps/balance-service",
+      "root": "apps/balance",
       "entryFile": "main",
-      "sourceRoot": "apps/balance-service/src",
+      "sourceRoot": "apps/balance/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/balance-service/tsconfig.app.json"
+        "tsConfigPath": "apps/balance/tsconfig.app.json"
       }
     },
-    "crypto-balance": {
+    "rate": {
       "type": "application",
-      "root": "apps/crypto-balance",
+      "root": "apps/rate",
       "entryFile": "main",
-      "sourceRoot": "apps/crypto-balance/src",
+      "sourceRoot": "apps/rate/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/crypto-balance/tsconfig.app.json"
-      }
-    },
-    "rate-service": {
-      "type": "application",
-      "root": "apps/rate-service",
-      "entryFile": "main",
-      "sourceRoot": "apps/rate-service/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/rate-service/tsconfig.app.json"
+        "tsConfigPath": "apps/rate/tsconfig.app.json"
       }
     },
     "shared": {

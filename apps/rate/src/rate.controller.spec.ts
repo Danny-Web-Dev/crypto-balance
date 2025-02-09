@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RateServiceController } from './rate-service.controller';
-import { RateServiceService } from './rate-service.service';
+import { RateController } from './rate.controller';
+import { RateService } from './rate.service';
 
 describe('RateServiceController', () => {
-  let rateServiceController: RateServiceController;
+  let rateServiceController: RateController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [RateServiceController],
-      providers: [RateServiceService],
+      controllers: [RateController],
+      providers: [RateService],
     }).compile();
 
-    rateServiceController = app.get<RateServiceController>(RateServiceController);
+    rateServiceController = app.get<RateController>(RateController);
   });
 
   describe('root', () => {

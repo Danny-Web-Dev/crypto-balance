@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BalanceServiceController } from './balance-service.controller';
-import { BalanceServiceService } from './balance-service.service';
+import { BalanceController } from './balance.controller';
+import { BalanceService } from './balance.service';
 
 describe('BalanceServiceController', () => {
-  let balanceServiceController: BalanceServiceController;
+  let balanceServiceController: BalanceController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [BalanceServiceController],
-      providers: [BalanceServiceService],
+      controllers: [BalanceController],
+      providers: [BalanceService],
     }).compile();
 
-    balanceServiceController = app.get<BalanceServiceController>(BalanceServiceController);
+    balanceServiceController = app.get<BalanceController>(BalanceController);
   });
 
   describe('root', () => {

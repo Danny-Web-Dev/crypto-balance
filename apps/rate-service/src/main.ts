@@ -6,6 +6,6 @@ import { ConfigService } from '@nestjs/config';
   const app = await NestFactory.create(RateServiceModule);
   const port = app.get(ConfigService).get<number>('PORT', 3002);
   app.enableCors();
-  await app.listen(3002);
+  await app.listen(port);
   console.log(`Rate Service running on port ${port}`);
 })();

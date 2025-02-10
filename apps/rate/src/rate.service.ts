@@ -47,29 +47,4 @@ export class RateService {
       throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
-
-  async getCryptoList(): Promise<CryptoRatesResponse> {
-    const cacheKey = 'crypto_rates:all';
-    const cachedRates = await this.redis.get(cacheKey);
-
-    if (cachedRates) {
-      return JSON.parse(cachedRates) as CryptoRatesResponse;
-    }
-
-    const url = `${this.configService.get<string>('CG_BASE_URL')}/coins/list`;
-
-    try {
-      const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
-        this.httpService.get<CryptoRatesResponse>(url),
-      );
-
-      if (response.data) {
-        await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 300);
-        return response.data;
-      }
-      throw new Error('No data returned from CoinGecko API');
-    } catch (error) {
-      throw new Error(`Error fetching all rates: ${error.message}`);
-    }
-  }
 }

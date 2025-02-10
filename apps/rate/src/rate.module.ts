@@ -5,7 +5,12 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [HttpModule, ConfigModule],
+  imports: [
+    HttpModule,
+    ConfigModule.forRoot({
+      envFilePath: './apps/rate/.env',
+      isGlobal: true,
+  }),],
   controllers: [RateController],
   providers: [RateService],
 })

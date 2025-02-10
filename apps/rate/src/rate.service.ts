@@ -3,6 +3,10 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
+import { AxiosResponse } from 'axios';
+import { CryptoRatesResponse } from '../types/crypto-rates-response.type';
+import { ServerError } from '@app/shared/errors/server-error';
+import ErrorType from '@app/shared/errors/error-type';
 
 @Injectable()
 export class RateService {
@@ -12,41 +16,60 @@ export class RateService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    // Initialize Redis connection
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
     this.redis = new Redis({
       host: configService.get<string>('REDIS_HOST', 'localhost'),
       port: configService.get<number>('REDIS_PORT', 6379),
     });
   }
 
-  async getCryptoRates(cryptoIds: string[]): Promise<any> {
+  async getCryptoRates(cryptoIds: string[]): Promise<CryptoRatesResponse> {
     const cacheKey = `crypto_rates:${cryptoIds.join(',')}`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
     const cachedRates = await this.redis.get(cacheKey);
 
     if (cachedRates) {
-      console.log('Fetching from cache');
-      return JSON.parse(cachedRates);
+      return JSON.parse(cachedRates) as CryptoRatesResponse;
     }
 
-    console.log('Fetching from CoinGecko');
-    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoIds.join(',')}&vs_currencies=usd`;
+    const url = `${this.configService.get<string>('CG_BASE_URL')}/simple/price?ids=${cryptoIds.join(',')}&vs_currencies=usd,eur`;
 
     try {
-      // Use lastValueFrom to convert the Observable to a Promise
-      const response = await lastValueFrom(this.httpService.get(url));
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const rates = response.data;
+      const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
+        this.httpService.get<CryptoRatesResponse>(url),
+      );
 
-      // Cache the response in Redis for 5 minutes
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-      await this.redis.set(cacheKey, JSON.stringify(rates), 'EX', 300); // Cache expires in 300 seconds (5 minutes)
+      if (response.data) {
+        await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 300); // Cache expires in 5 minutes
+        return response.data;
+      }
+      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
+    } catch (error: any) {
+      console.error(error);
+      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
+    }
+  }
 
-      return rates;
+  async getCryptoList(): Promise<CryptoRatesResponse> {
+    const cacheKey = 'crypto_rates:all';
+    const cachedRates = await this.redis.get(cacheKey);
+
+    if (cachedRates) {
+      return JSON.parse(cachedRates) as CryptoRatesResponse;
+    }
+
+    const url = `${this.configService.get<string>('CG_BASE_URL')}/coins/list`;
+
+    try {
+      const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
+        this.httpService.get<CryptoRatesResponse>(url),
+      );
+
+      if (response.data) {
+        await this.redis.set(cacheKey, JSON.stringify(response.data), 'EX', 300);
+        return response.data;
+      }
+      throw new Error('No data returned from CoinGecko API');
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      throw new Error(`Error fetching rates: ${error.message}`);
+      throw new Error(`Error fetching all rates: ${error.message}`);
     }
   }
 }

@@ -5,12 +5,14 @@ import { Balance } from '../interfaces/balance';
 import { UserBalances } from '../interfaces/user-balance';
 import { ServerError } from '@app/shared/errors/server-error';
 import ErrorType from '@app/shared/errors/error-type';
+import { LoggingService } from '@app/shared/log/log.service';
 
 // Interfaces
 
 // Service
 @Injectable()
 export class BalanceService {
+  constructor(private readonly loggingService: LoggingService) {}
   private readonly filePath = join(
     __dirname,
     '../../../libs/shared/src/data/balances.json',
@@ -39,11 +41,16 @@ export class BalanceService {
   }
 
   addBalance(userId: string, asset: string, amount: number): void {
-    const data = this.readData();
-    console.log(data);
-    data[userId] = data[userId] || {};
-    data[userId][asset] = (data[userId][asset] || 0) + amount;
-    this.writeData(data);
+    this.loggingService.log(`Adding balance for userId: ${userId}`);
+    try {
+      const data = this.readData();
+      data[userId] = data[userId] || {};
+      data[userId][asset] = (data[userId][asset] || 0) + amount;
+      return this.writeData(data);
+    } catch (error: any) {
+      console.error(error);
+      throw new ServerError('test', 1234);
+    }
   }
 
   removeBalance(userId: string, asset: string): void {

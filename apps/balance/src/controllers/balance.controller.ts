@@ -9,6 +9,9 @@ import {
 } from '@nestjs/common';
 import { BalanceService } from '../services/balance.service';
 import { Balance } from '../interfaces/balance';
+import { ServerError } from '@app/shared/errors/server-error';
+import { ERROR_PREFIX } from '@nestjs/cli/lib/ui';
+import ErrorType from '@app/shared/errors/error-type';
 
 @Controller('balances')
 export class BalanceController {
@@ -28,9 +31,10 @@ export class BalanceController {
     const userId = headers['x-user-id']; // Extract header manually
 
     console.log(userId);
-    // if (!userId) {
-    //   throw new BadRequestException('X-User-ID header is required');
-    // }
+    if (!userId) {
+      console.error();
+      throw new ServerError(ErrorType.BAD_REQUEST.message, ErrorType.BAD_REQUEST.errorCode);
+    }
 
     this.balanceService.addBalance(userId, body.asset, body.amount);
     return { message: 'Balance updated successfully' };

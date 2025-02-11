@@ -1,24 +1,35 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+// libs/logging/src/logging.service.ts
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class LoggingService implements LoggerService {
+export class LoggingService {
+  // Define color codes using ANSI escape sequences
+  private readonly colors = {
+    log: '\x1b[32m',       // Green
+    error: '\x1b[31m',     // Red
+    warn: '\x1b[33m',      // Yellow
+    debug: '\x1b[34m',     // Blue
+    verbose: '\x1b[35m',   // Magenta
+    reset: '\x1b[0m',
+  };
+
   log(message: string) {
-    console.log(`[LOG] ${message}`);
+    console.log(`${this.colors.log}[LOG] ${message}${this.colors.reset}`);
   }
 
   error(message: string, trace: string) {
-    console.error(`[ERROR] ${message}`, trace);
+    console.error(`${this.colors.error}[ERROR] ${message} ${trace}${this.colors.reset}`);
   }
 
   warn(message: string) {
-    console.warn(`[WARN] ${message}`);
+    console.warn(`${this.colors.warn}[WARN] ${message}${this.colors.reset}`);
   }
 
   debug(message: string) {
-    console.debug(`[DEBUG] ${message}`);
+    console.debug(`${this.colors.debug}[DEBUG] ${message}${this.colors.reset}`);
   }
 
   verbose(message: string) {
-    console.log(`[VERBOSE] ${message}`);
+    console.log(`${this.colors.verbose}[VERBOSE] ${message}${this.colors.reset}`);
   }
 }

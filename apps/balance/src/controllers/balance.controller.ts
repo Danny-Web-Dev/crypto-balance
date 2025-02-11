@@ -8,7 +8,7 @@ import {
   Headers,
 } from '@nestjs/common';
 import { BalanceService } from '../services/balance.service';
-import { Balance } from '../interfaces/balance';
+import { Balance } from '@app/shared/interfaces/balance/balance';
 import { ServerError } from '@app/shared/errors/server-error';
 import ErrorType from '@app/shared/errors/error-type';
 import { LoggingService } from '@app/shared/log/log.service';

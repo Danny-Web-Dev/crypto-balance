@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { RateService } from './rate.service';
-import { CryptoRatesResponse } from '../types/crypto-rates-response.type';
-import { CryptoDetails } from '../types/crypto-details';
+import { CryptoRatesResponse } from '@app/shared/interfaces/rate/crypto-rates-response.type';
+import { CryptoDetails } from '@app/shared/interfaces/rate/crypto-details';
 
 @Controller('rates')
 export class RateController {

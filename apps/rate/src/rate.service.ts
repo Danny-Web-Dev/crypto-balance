@@ -4,10 +4,10 @@ import { lastValueFrom } from 'rxjs';
 import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { AxiosResponse } from 'axios';
-import { CryptoRatesResponse } from '../types/crypto-rates-response.type';
+import { CryptoRatesResponse } from '@app/shared/interfaces/rate/crypto-rates-response.type';
 import { ServerError } from '@app/shared/errors/server-error';
 import ErrorType from '@app/shared/errors/error-type';
-import { CryptoDetails } from '../types/crypto-details';
+import { CryptoDetails } from '@app/shared/interfaces/rate/crypto-details';
 
 @Injectable()
 export class RateService {

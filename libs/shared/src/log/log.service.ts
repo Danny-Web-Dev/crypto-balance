@@ -1,9 +1,7 @@
-// libs/logging/src/logging.service.ts
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class LoggingService {
-  // Define color codes using ANSI escape sequences
   private readonly colors = {
     log: '\x1b[32m',       // Green
     error: '\x1b[31m',     // Red

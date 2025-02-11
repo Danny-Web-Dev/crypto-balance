@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { BalanceController } from './controllers/balance.controller';
-import { BalanceService } from './services/balance.service';
-import { LoggingService } from '@app/shared/log/log.service';
+import { BalanceController } from './balance.controller';
+import { BalanceService } from './balance.service';
+// import { LoggingService } from '@app/shared/log/log.service';
+import { SharedModule } from '@app/shared/shared.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true })],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), SharedModule],
   controllers: [BalanceController],
-  providers: [BalanceService, LoggingService],
+  providers: [BalanceService],
 })
 export class BalanceModule {}

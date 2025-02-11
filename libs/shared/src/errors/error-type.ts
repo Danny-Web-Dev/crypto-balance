@@ -2,7 +2,7 @@ const ErrorType = {
   GENERAL_ERROR: {
     id: 1,
     errorCode: 600,
-    message: 'A general error ....',
+    message: 'A general common ....',
   },
   BAD_REQUEST: {
     id: 3,

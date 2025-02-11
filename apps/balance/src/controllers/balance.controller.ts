@@ -26,10 +26,7 @@ export class BalanceController {
   }
 
   @Post()
-  addBalance(
-    @Headers('x-user-id') userId: string,
-    @Body() body: { asset: string; amount: number },
-  ){
+  addBalance(@Headers('x-user-id') userId: string, @Body() body: { asset: string; amount: number }) {
     if (!userId) {
       this.loggingService.log(`No userId was found on x-user-id header. ${userId}`);
       throw new ServerError(ErrorType.BAD_REQUEST.message, ErrorType.BAD_REQUEST.errorCode);
@@ -39,10 +36,7 @@ export class BalanceController {
   }
 
   @Delete(':asset')
-  removeBalance(
-    @Headers('x-user-id') userId: string,
-    @Param('asset') asset: string,
-  ) {
+  removeBalance(@Headers('x-user-id') userId: string, @Param('asset') asset: string) {
     this.balanceService.removeBalance(userId, asset);
     return { message: 'Balance removed successfully' };
   }

@@ -77,25 +77,25 @@ export class BalanceService {
     }
   }
 
-  async subtractBalance(userId: string, asset: string, amount: number): Promise<object | undefined> {
+  async updateBalance(userId: string, asset: string, amount: number): Promise<void> {
     try {
       const data = await this.readData();
+
       if (data[userId] && data[userId][asset]) {
         const oldAmount = data[userId][asset];
-        data[userId][asset] -= amount;
-        if (data[userId][asset] === 0) {
-          delete data[userId][asset];
-        }
+        data[userId][asset] = amount;
+
         if (Object.keys(data[userId]).length === 0) {
           delete data[userId];
         }
+
         await this.writeData(data);
-        this.loggingService.log(`$\{asset} was subtracted successfully. from ${oldAmount} to ${oldAmount - amount}`);
-        return {message: `asset: ${asset} was subtracted successfully.`};
+        this.loggingService.log(`${asset} balance was updated successfully from ${oldAmount} to ${amount}`);
       }
     } catch (error: any) {
       console.error(error);
       throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
+
 }

@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  Param,
-  Headers,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Post } from '@nestjs/common';
 import { BalanceService } from './balance.service';
 import { Balance } from '@app/shared/interfaces/balance/balance';
 import { ServerError } from '@app/shared/errors/server-error';
@@ -43,15 +35,17 @@ export class BalanceController {
     await this.balanceService.removeBalance(userId, asset);
   }
 
-  @Post(':userId/subtract')
-  async subtractBalance(
-    @Param('userId') userId: string,
+  @Post('/update')
+  async updateBalance(
     @Body() body: { asset: string; amount: number },
-    @Headers('X-User-ID') headerUserId: string,
-  ): Promise<object | undefined> {
-    if (userId !== headerUserId) {
-      throw new Error('User ID mismatch');
+    @Headers('X-User-ID') userId: string,
+  ): Promise<void> {
+    // Check if the userId in the path matches the one in the header
+    if (!userId) {
+      this.loggingService.log(`No userId was found`);
+      throw new ServerError(ErrorType.BAD_REQUEST.message, ErrorType.BAD_REQUEST.errorCode);
     }
-    return await this.balanceService.subtractBalance(userId, body.asset, body.amount);
+
+    return await this.balanceService.updateBalance(userId, body.asset, body.amount);
   }
 }

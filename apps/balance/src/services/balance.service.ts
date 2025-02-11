@@ -7,9 +7,6 @@ import { ServerError } from '@app/shared/errors/server-error';
 import ErrorType from '@app/shared/errors/error-type';
 import { LoggingService } from '@app/shared/log/log.service';
 
-// Interfaces
-
-// Service
 @Injectable()
 export class BalanceService {
   constructor(private readonly loggingService: LoggingService) {}
@@ -19,15 +16,15 @@ export class BalanceService {
   );
 
   private readData(): UserBalances {
+    if (!existsSync(this.filePath)) {
+      this.loggingService.log(`File: ${this.filePath} does not exist`);
+      return {} as UserBalances;
+    }
     try {
-      if (!existsSync(this.filePath)) return {} as UserBalances;
       return JSON.parse(readFileSync(this.filePath, 'utf8')) as UserBalances;
     } catch (error: any) {
       console.error(error);
-      throw new ServerError(
-        ErrorType.GENERAL_ERROR.message,
-        ErrorType.GENERAL_ERROR.errorCode,
-      );
+      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
 

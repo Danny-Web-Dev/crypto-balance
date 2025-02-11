@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { BalanceController } from './balance.controller';
-import { BalanceService } from './balance.service';
+import { BalanceController } from './controllers/balance.controller';
+import { BalanceService } from './services/balance.service';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true })],

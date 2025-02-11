@@ -7,11 +7,14 @@ export class ServerErrorExceptionFilter implements ExceptionFilter {
   catch(exception: ServerError, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse<Response>();
     const statusCode = exception.errorCode || 500;
+    const message = exception.additionalData ? `${exception.message} ${exception.additionalData}` : exception.message || 'Internal Server error';
 
     response.status(statusCode).json({
       success: false,
-      message: exception.message,
-      errorCode: exception.errorCode,
+      data: {
+        message: message,
+        errorCode: exception.errorCode,
+      }
     });
   }
 }

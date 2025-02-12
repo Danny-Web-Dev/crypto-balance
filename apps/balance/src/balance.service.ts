@@ -34,13 +34,18 @@ export class BalanceService {
     return data[userId] || {};
   }
 
-  public async addBalance(userId: string, asset: string, amount: number): Promise<void> {
+  public async addBalance(userId: string, asset: string, amount: number): Promise<Balance> {
     try {
       const data = await this.readData();
-      data[userId] = data[userId] || {};
-      data[userId][asset] = (data[userId][asset] || 0) + amount;
+      data[userId] ??= {};
+      data[userId][asset] ??= { amount: 0, currencies: { usd: 0, eur: 0, gbp: 0 } };
+      data[userId][asset].amount += amount;
+
       await this.fsUtilService.writeData<UserBalances>(this.filePath, data);
+
       this.loggingService.log(`Added balance for userId: ${userId}, asset: ${asset}, amount: ${amount}`);
+
+      return data[userId];
     } catch (error: any) {
       this.loggingService.error<any>(error);
       throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);

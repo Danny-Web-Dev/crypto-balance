@@ -15,9 +15,9 @@ export class BalanceController {
   public async add(
     @Headers('x-user-id') userId: string,
     @Body() body: { asset: string; amount: number },
-  ): Promise<{ message: string; userId: string }> {
-    await this.balanceService.addBalance(userId, body.asset, body.amount);
-    return { userId: userId, message: `Added balance` };
+  ): Promise<Balance> {
+    return await this.balanceService.addBalance(userId, body.asset, body.amount);
+    // return { userId: userId, message: `Added balance` };
   }
 
   @Delete(':asset')

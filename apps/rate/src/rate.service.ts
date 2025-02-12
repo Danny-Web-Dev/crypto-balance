@@ -66,9 +66,7 @@ export class RateService {
     }
   }
 
-  async getAllCryptoRatesByCurrency(
-    currency: string,
-  ): Promise<CryptoDetails[]> {
+  async getAllCryptoRatesByCurrency(currency: string): Promise<CryptoDetails[]> {
     const url = `${this.url}/coins/markets?vs_currency=${currency}`;
 
     try {

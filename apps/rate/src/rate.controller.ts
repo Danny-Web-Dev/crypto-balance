@@ -1,7 +1,6 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { RateService } from './rate.service';
 import { CryptoRatesResponse } from '@app/shared/interfaces/rate/crypto-rates-response.type';
-import { CryptoDetails } from '@app/shared/interfaces/rate/crypto-details';
 
 @Controller('rates')
 export class RateController {
@@ -11,10 +10,5 @@ export class RateController {
   async getCryptoRatesById(@Query('ids') ids: string): Promise<CryptoRatesResponse> {
     const cryptoIds = ids.split(',');
     return await this.rateService.getCryptoRates(cryptoIds);
-  }
-
-  @Get('coin-id/:coinId')
-  async getCryptoDetailsByCoinId(@Param('coinId') coinId: string): Promise<CryptoDetails> {
-    return await this.rateService.getCryptoDetailsByCoinId(coinId);
   }
 }

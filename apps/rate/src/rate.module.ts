@@ -3,7 +3,7 @@ import { RateService } from './rate.service';
 import { RateController } from './rate.controller';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-import { SharedModule } from '@app/shared';
+import { SharedModule } from '@app/shared/shared.module';
 
 @Module({
   imports: [

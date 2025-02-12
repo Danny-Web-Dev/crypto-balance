@@ -11,6 +11,7 @@ import { CryptoRatesResponse } from '@app/shared/interfaces/rate/crypto-rates-re
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { Currencies } from '@app/shared/interfaces/balance/currencies';
 
 @Injectable()
 export class BalanceService {
@@ -47,10 +48,7 @@ export class BalanceService {
       data[userId] ??= {};
       data[userId][asset] ??= { amount: 0, currencies: { usd: 0, eur: 0, gbp: 0 } };
       data[userId][asset].amount += amount;
-      const coinDetails = await this.getCoinDetails(asset);
-      data[userId][asset].currencies = coinDetails;
-
-
+      data[userId][asset].currencies = await this.getCoinDetails(asset);
       await this.fsUtilService.writeData<UserBalances>(this.filePath, data);
       this.loggingService.log(`Added balance for userId: ${userId}, asset: ${asset}, amount: ${amount}`);
 
@@ -61,16 +59,19 @@ export class BalanceService {
     }
   }
 
-  private async getCoinDetails(asset: string): Promise<any> {
+  private async getCoinDetails(asset: string): Promise<Currencies> {
     const url = `${this.configService.get<string>('RATES_HOST')}/rates/coin-ids?ids=${asset}`;
 
     const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
       this.httpService.get<CryptoRatesResponse>(url),
     );
 
-    console.log();
+    const coinData = response.data.data[asset];
 
-    return response.data.data[asset] || ({} as CryptoRatesResponse);
+    if (typeof coinData === 'object' && coinData !== null) {
+      return coinData as Currencies;
+    }
+    return { usd: 0, eur: 0, gbp: 0 };
   }
 
   public async removeBalance(userId: string, asset: string): Promise<void> {

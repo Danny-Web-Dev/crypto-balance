@@ -24,6 +24,16 @@ const ErrorType = {
     errorCode: 602,
     message: 'File not found.',
   },
+  UNABLE_TO_WRITE_TO_FILE: {
+    id: 7,
+    errorCode: 603,
+    message: 'Unable to write to file.',
+  },
+  UNABLE_TO_READ_FILE: {
+    id: 8,
+    errorCode: 604,
+    message: 'Unable to read file.',
+  },
 };
 
 export default ErrorType;

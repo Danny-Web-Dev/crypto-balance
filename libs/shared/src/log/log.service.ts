@@ -15,8 +15,9 @@ export class LoggingService {
     console.log(`${this.colors.log}[LOG] ${message}${this.colors.reset}`);
   }
 
-  error(message: string, trace: string) {
-    console.error(`${this.colors.error}[ERROR] ${message} ${trace}${this.colors.reset}`);
+  error<T>(message: T, trace: string = '') {
+    const messageStr = JSON.stringify(message);
+    console.error(`${this.colors.error}[ERROR] ${messageStr} ${trace}${this.colors.reset}`);
   }
 
   warn(message: string) {

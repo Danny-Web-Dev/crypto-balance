@@ -6,8 +6,7 @@ import { LoggingService } from '@app/shared/log/log.service';
 
 @Injectable()
 export class FsUtilService {
-  constructor(private readonly loggingService: LoggingService) {
-  }
+  constructor(private readonly loggingService: LoggingService) {}
 
   public async fileExists(filePath: string): Promise<boolean> {
     try {

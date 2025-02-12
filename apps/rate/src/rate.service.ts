@@ -12,7 +12,7 @@ import { RedisService } from '@app/shared/redis/redis.service';
 
 @Injectable()
 export class RateService {
-  private readonly url: string | undefined;
+  private url: string | undefined;
 
   constructor(
     private readonly httpService: HttpService,
@@ -20,6 +20,10 @@ export class RateService {
     private readonly loggingService: LoggingService,
     private readonly redisService: RedisService,
   ) {
+    this.init();
+  }
+
+  init(): void {
     this.url = this.configService.get<string>('CG_BASE_URL');
     if (!this.url) {
       this.loggingService.error('Could not find CoinGecko url');
@@ -41,7 +45,7 @@ export class RateService {
       );
 
       if (response.data) {
-        await this.redisService.set(cacheKey, JSON.stringify(response.data), 300); // Cache expires in 5 minutes
+        await this.redisService.set(cacheKey, JSON.stringify(response.data), 300);
       }
       return response.data;
     } catch (error: any) {
@@ -50,14 +54,21 @@ export class RateService {
     }
   }
 
-  async getAllCryptoRatesByCurrency(currency: string): Promise<CryptoDetails[]> {
-    const url = `${this.url}/coins/markets?vs_currency=${currency}`;
+  async getCryptoDetailsByCoinId(coinId: string): Promise<CryptoDetails> {
+    const cacheKey = `crypto_rate:${coinId}`;
+    const cachedDetails = await this.redisService.get(cacheKey);
+
+    if (cachedDetails) {
+      return JSON.parse(cachedDetails) as CryptoDetails;
+    }
+
+    const url = `${this.url}/coins/${coinId}`;
 
     try {
-      const response: AxiosResponse<CryptoDetails[]> = await lastValueFrom(
-        this.httpService.get<CryptoDetails[]>(url),
-      );
-
+      const response: AxiosResponse<CryptoDetails> = await lastValueFrom(this.httpService.get<CryptoDetails>(url));
+      if (response.data) {
+        await this.redisService.set(cacheKey, JSON.stringify(response.data), 300);
+      }
       return response.data;
     } catch (error) {
       this.loggingService.error(error);

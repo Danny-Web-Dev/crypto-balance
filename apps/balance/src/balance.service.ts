@@ -29,12 +29,12 @@ export class BalanceService {
     }
   }
 
-  async getBalances(userId: string): Promise<Balance> {
+  public async getBalances(userId: string): Promise<Balance> {
     const data = await this.readData();
     return data[userId] || {};
   }
 
-  async addBalance(userId: string, asset: string, amount: number): Promise<void> {
+  public async addBalance(userId: string, asset: string, amount: number): Promise<void> {
     try {
       const data = await this.readData();
       data[userId] = data[userId] || {};
@@ -47,7 +47,7 @@ export class BalanceService {
     }
   }
 
-  async removeBalance(userId: string, asset: string): Promise<void> {
+  public async removeBalance(userId: string, asset: string): Promise<void> {
     try {
       const data = await this.readData();
       if (data[userId]) {
@@ -62,7 +62,7 @@ export class BalanceService {
     }
   }
 
-  async updateBalance(userId: string, asset: string, amount: number): Promise<void> {
+  public async updateBalance(userId: string, asset: string, amount: number): Promise<void> {
     try {
       const data = await this.readData();
       if (data[userId] && data[userId][asset]) {
@@ -78,7 +78,7 @@ export class BalanceService {
     }
   }
 
-  cleanNoBalanceUser(data: UserBalances, userId: string): void {
+  private cleanNoBalanceUser(data: UserBalances, userId: string): void {
     if (Object.keys(data[userId]).length === 0) {
       delete data[userId];
     }

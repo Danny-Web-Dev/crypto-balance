@@ -7,12 +7,12 @@ export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
   @Get()
-  async get(@Headers('x-user-id') userId: string): Promise<Balance> {
+  public async get(@Headers('x-user-id') userId: string): Promise<Balance> {
     return await this.balanceService.getBalances(userId);
   }
 
   @Post()
-  async add(
+  public async add(
     @Headers('x-user-id') userId: string,
     @Body() body: { asset: string; amount: number },
   ): Promise<{ message: string; userId: string }> {
@@ -21,13 +21,13 @@ export class BalanceController {
   }
 
   @Delete(':asset')
-  async remove(@Headers('x-user-id') userId: string, @Param('asset') asset: string): Promise<{ userId: string }> {
+  public async remove(@Headers('x-user-id') userId: string, @Param('asset') asset: string): Promise<{ userId: string }> {
     await this.balanceService.removeBalance(userId, asset);
     return { userId: userId };
   }
 
   @Put('/update')
-  async updateBalance(
+  public async updateBalance(
     @Body() body: { asset: string; amount: number },
     @Headers('X-User-ID') userId: string,
   ): Promise<{ userId: string }> {

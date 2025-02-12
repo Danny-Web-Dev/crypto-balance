@@ -45,18 +45,9 @@ export class RateService {
       );
 
       if (response.data) {
-        await this.redis.set(
-          cacheKey,
-          JSON.stringify(response.data),
-          'EX',
-          300,
-        ); // Cache expires in 5 minutes
-        return response.data;
+        await this.redis.set(cacheKey, JSON.stringify(response.data),'EX',300,); // Cache expires in 5 minutes
       }
-      throw new ServerError(
-        ErrorType.GENERAL_ERROR.message,
-        ErrorType.GENERAL_ERROR.errorCode,
-      );
+      return response.data;
     } catch (error: any) {
       console.error(error);
       throw new ServerError(

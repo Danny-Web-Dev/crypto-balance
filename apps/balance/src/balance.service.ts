@@ -71,8 +71,8 @@ export class BalanceService {
     try {
       const data = await this.readData();
       if (data[userId] && data[userId][asset]) {
-        const oldAmount = data[userId][asset];
-        data[userId][asset] = amount;
+        const oldAmount = data[userId][asset].amount;
+        data[userId][asset].amount = amount;
         this.cleanNoBalanceUser(data, userId);
         await this.fsUtilService.writeData<UserBalances>(this.filePath, data);
         this.loggingService.log(`${asset} balance was updated successfully from ${oldAmount} to ${amount}`);

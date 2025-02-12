@@ -1,39 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
-import { Redis } from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { AxiosResponse } from 'axios';
 import { CryptoRatesResponse } from '@app/shared/interfaces/rate/crypto-rates-response.type';
 import { ServerError } from '@app/shared/errors/server-error';
 import ErrorType from '@app/shared/errors/error-type';
 import { CryptoDetails } from '@app/shared/interfaces/rate/crypto-details';
+import { LoggingService } from '@app/shared/log/log.service';
+import { RedisService } from '@app/shared/redis/redis.service';
 
 @Injectable()
 export class RateService {
   private readonly url: string | undefined;
-  private redis: Redis;
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly loggingService: LoggingService,
+    private readonly redisService: RedisService,
   ) {
-    this.redis = new Redis({
-      host: configService.get<string>('REDIS_HOST', 'localhost'),
-      port: configService.get<number>('REDIS_PORT', 6379),
-    });
-    this.url = configService.get<string>('CG_BASE_URL');
+    this.url = this.configService.get<string>('CG_BASE_URL');
     if (!this.url) {
-      throw new ServerError(
-        ErrorType.GENERAL_ERROR.message,
-        ErrorType.GENERAL_ERROR.errorCode,
-      );
+      this.loggingService.error('Could not find CoinGecko url');
+      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
 
   async getCryptoRates(cryptoIds: string[]): Promise<CryptoRatesResponse> {
     const cacheKey = `crypto_rates:${cryptoIds.join(',')}`;
-    const cachedRates = await this.redis.get(cacheKey);
+    const cachedRates = await this.redisService.get(cacheKey);
 
     if (cachedRates) {
       return JSON.parse(cachedRates) as CryptoRatesResponse;
@@ -45,15 +41,12 @@ export class RateService {
       );
 
       if (response.data) {
-        await this.redis.set(cacheKey, JSON.stringify(response.data),'EX',300,); // Cache expires in 5 minutes
+        await this.redisService.set(cacheKey, JSON.stringify(response.data), 300); // Cache expires in 5 minutes
       }
       return response.data;
     } catch (error: any) {
-      console.error(error);
-      throw new ServerError(
-        ErrorType.GENERAL_ERROR.message,
-        ErrorType.GENERAL_ERROR.errorCode,
-      );
+      this.loggingService.error(error);
+      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
 
@@ -67,11 +60,8 @@ export class RateService {
 
       return response.data;
     } catch (error) {
-      console.error(error);
-      throw new ServerError(
-        ErrorType.GENERAL_ERROR.message,
-        ErrorType.GENERAL_ERROR.errorCode,
-      );
+      this.loggingService.error(error);
+      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
 }

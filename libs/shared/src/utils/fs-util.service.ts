@@ -8,21 +8,12 @@ import { LoggingService } from '@app/shared/log/log.service';
 export class FsUtilService {
   constructor(private readonly loggingService: LoggingService) {}
 
-  public async fileExists(filePath: string): Promise<boolean> {
-    try {
-      await fsPromises.access(filePath);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   public async readFile<T>(filePath: string, options: object = { encoding: 'utf8', flag: undefined }): Promise<T> {
     try {
       const fileContent = await fsPromises.readFile(filePath, options);
       return JSON.parse(fileContent as unknown as string) as T;
     } catch (error: any) {
-      this.loggingService.error<any>(error);
+      this.loggingService.error(error);
       throw new ServerError(ErrorType.UNABLE_TO_READ_FILE.message, ErrorType.UNABLE_TO_READ_FILE.errorCode);
     }
   }

@@ -17,21 +17,18 @@ export class BalanceController {
     @Body() body: { asset: string; amount: number },
   ): Promise<Balance> {
     return await this.balanceService.addBalance(userId, body.asset, body.amount);
-    // return { userId: userId, message: `Added balance` };
   }
 
   @Delete(':asset')
   public async remove(@Headers('x-user-id') userId: string, @Param('asset') asset: string): Promise<{ userId: string }> {
-    await this.balanceService.removeBalance(userId, asset);
-    return { userId: userId };
+    return await this.balanceService.removeBalance(userId, asset);
   }
 
   @Put('/update')
   public async updateBalance(
     @Body() body: { asset: string; amount: number },
-    @Headers('X-User-ID') userId: string,
+    @Headers('x-user-id') userId: string,
   ): Promise<{ userId: string }> {
-    await this.balanceService.updateBalance(userId, body.asset, body.amount);
-    return { userId: userId };
+    return await this.balanceService.updateBalance(userId, body.asset, body.amount);
   }
 }

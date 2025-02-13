@@ -6,7 +6,7 @@ import { ServerErrorExceptionFilter } from './filters/server-error-exception.fil
 import { ResponseWrapperInterceptor } from './interceptors/response-wrapper.interceptor';
 import { RedisService } from '@app/shared/redis/redis.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { DataService } from '@app/shared/data/data.service';
+import { BalanceDataService } from '@app/shared/data/balance-data/balance-data.service';
 
 @Module({
   imports: [ScheduleModule.forRoot()],
@@ -17,7 +17,7 @@ import { DataService } from '@app/shared/data/data.service';
     ResponseWrapperInterceptor,
     FsUtilService,
     RedisService,
-    DataService,
+    BalanceDataService,
   ],
   exports: [
     SharedService,
@@ -26,7 +26,7 @@ import { DataService } from '@app/shared/data/data.service';
     ResponseWrapperInterceptor,
     FsUtilService,
     RedisService,
-    DataService,
+    BalanceDataService,
   ],
 })
 export class SharedModule {}

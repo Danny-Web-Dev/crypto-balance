@@ -4,6 +4,11 @@ const ErrorType = {
     errorCode: 600,
     message: 'A general common ....',
   },
+  INTERNAL_SERVER_ERROR: {
+    id: 2,
+    errorCode: 500,
+    message: 'Internal server error',
+  },
   BAD_REQUEST: {
     id: 3,
     errorCode: 400,
@@ -34,6 +39,22 @@ const ErrorType = {
     errorCode: 604,
     message: 'Unable to read file.',
   },
+  UNABLE_TO_FETCH_DATA: {
+    id: 9,
+    errorCode: 605,
+    message: 'Unable to fetch data.',
+  },
+  MISSING_PARAMS: {
+    id: 10,
+    errorCode: 606,
+    message: 'Parameters are missing.',
+  },
+  ASSET_NOT_FOUND: {
+    id: 11,
+    errorCode: 607,
+    message: 'Asset not found.',
+  },
+
 };
 
 export default ErrorType;

@@ -14,8 +14,13 @@ export class BalanceDataService {
 
   private readonly filePath = join(__dirname, '../../../libs/shared/src/data/balance-data/balances.json');
 
-  async getAllData(): Promise<UserBalances> {
-    return await this.fsUtilService.readFile<UserBalances>(this.filePath);
+  async getAllData(): Promise<UserBalances | null> {
+    try {
+      return await this.fsUtilService.readFile<UserBalances>(this.filePath);
+    } catch (error) {
+      this.loggingService.error(error);
+      return null
+    }
   }
 
   async readData(): Promise<UserBalances> {

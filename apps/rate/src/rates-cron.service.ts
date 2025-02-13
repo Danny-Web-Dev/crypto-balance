@@ -6,6 +6,7 @@ import { BalanceDataService } from '@app/shared/data/balance-data/balance-data.s
 import { UserBalances } from '@app/shared/interfaces/balance/user-balance';
 import { Balance } from '@app/shared/interfaces/balance/balance';
 import { Currencies } from '@app/shared/interfaces/balance/currencies';
+import { CryptoRatesResponse } from '@app/shared/interfaces/rate/crypto-rates-response.type';
 
 @Injectable()
 export class RatesCronService {
@@ -16,21 +17,40 @@ export class RatesCronService {
   ) {}
 
   @Cron(CronExpression.EVERY_30_MINUTES)
-  async handleCron() {
-    this.loggingService.log('Fetching latest crypto rates...');
-    const data = await this.balanceDataService.getAllData();
-    const assets = this.extractAssetNames(data);
-    const latestRates = await this.rateService.getCryptoRates(assets, true);
+  async handleCron(): Promise<void> {
+    this.loggingService.log('Fetching latest crypto rates.');
+
+    try {
+      const data = await this.balanceDataService.getAllData();
+      if (!data || Object.keys(data).length === 0) {
+        return this.loggingService.log('No balance data available.');
+      }
+
+      const assets = this.extractAssetNames(data);
+      if (assets.length === 0) {
+        return this.loggingService.log('No assets found.');
+      }
+
+      const latestRates = await this.rateService.getCryptoRates(assets, true);
+      this.updateUserBalancesWithRates(data, latestRates);
+
+      await this.balanceDataService.writeData(data);
+      this.loggingService.log('Updated asset rates successfully with the latest crypto rates.');
+    } catch (error) {
+      this.loggingService.error(`Cron job failed: ${error.message}`);
+    }
+  }
+
+  private updateUserBalancesWithRates(data: UserBalances, latestRates: CryptoRatesResponse): void {
     Object.values(data).forEach((userBalances: Balance) => {
-      Object.keys(userBalances).forEach((asset: string) => {
+      Object.entries(userBalances).forEach(([asset, balance]) => {
         if (latestRates[asset]) {
-          userBalances[asset].currencies = { ...latestRates[asset] } as Currencies;
+          balance.currencies = { ...latestRates[asset] } as Currencies;
         }
       });
     });
-    await this.balanceDataService.writeData(data);
-    this.loggingService.log('Update assets rates successfully with latest crypto rates...');
   }
+
 
   extractAssetNames(data: UserBalances): string[] {
     const assetNames = new Set<string>();

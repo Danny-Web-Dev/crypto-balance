@@ -27,33 +27,48 @@ export class RateService {
     this.url = this.configService.get<string>('CG_BASE_URL');
     if (!this.url) {
       this.loggingService.error('Could not find CoinGecko url');
-      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
+      throw new ServerError(ErrorType.INTERNAL_SERVER_ERROR.message, ErrorType.INTERNAL_SERVER_ERROR.errorCode);
     }
   }
 
-  async getCryptoRates(cryptoIds: string[], forceCG: boolean = false): Promise<CryptoRatesResponse> {
+  async getCryptoRates(cryptoIds: string[], forceRefresh: boolean = false): Promise<CryptoRatesResponse> {
     const cacheKey = `crypto_rates:${cryptoIds.join(',')}`;
 
-    if (!forceCG) {
-      const cachedRates = await this.redisService.get(cacheKey);
-      if (cachedRates) {
-        return JSON.parse(cachedRates) as CryptoRatesResponse;
-      }
+    if (!forceRefresh) {
+      const cachedRates = await this.getCachedRates(cacheKey);
+      if (cachedRates) return cachedRates;
     }
 
+    return this.fetchAndCacheRates(cacheKey, cryptoIds);
+  }
+
+  private async getCachedRates(cacheKey: string): Promise<CryptoRatesResponse | null> {
+    try {
+      const cachedData = await this.redisService.get(cacheKey);
+      return cachedData ? JSON.parse(cachedData) as CryptoRatesResponse : null;
+    } catch (error) {
+      this.loggingService.warn(`Failed to retrieve cache for ${cacheKey}: ${error.message}`);
+      return null;
+    }
+  }
+
+  private async fetchAndCacheRates(cacheKey: string, cryptoIds: string[]): Promise<CryptoRatesResponse> {
     const url = `${this.url}/simple/price?ids=${cryptoIds.join(',')}&vs_currencies=usd,eur`;
+
     try {
       const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
-        this.httpService.get<CryptoRatesResponse>(url),
+        this.httpService.get<CryptoRatesResponse>(url)
       );
 
       if (response.data) {
         await this.redisService.set(cacheKey, JSON.stringify(response.data), 300);
       }
+
       return response.data;
-    } catch (error: any) {
-      this.loggingService.error(error);
+    } catch (error) {
+      this.loggingService.error(`Error fetching crypto rates: ${error.message}`);
       throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
     }
   }
+
 }

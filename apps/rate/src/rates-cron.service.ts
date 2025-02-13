@@ -51,7 +51,6 @@ export class RatesCronService {
     });
   }
 
-
   extractAssetNames(data: UserBalances): string[] {
     const assetNames = new Set<string>();
     Object.values(data).forEach((userBalances: Balance) => {

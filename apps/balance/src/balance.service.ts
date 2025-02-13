@@ -82,12 +82,8 @@ export class BalanceService {
 
       return { usd: 0, eur: 0, gbp: 0 };
     } catch (error) {
-      this.loggingService.error(error);
-      throw new ServerError(
-        ErrorType.UNABLE_TO_FETCH_DATA.message,
-        ErrorType.UNABLE_TO_FETCH_DATA.errorCode,
-        `url: ${url}`,
-      );
+      this.loggingService.error(`Unable to fetch data from url: ${url}, details: ${error}`);
+      throw new ServerError(ErrorType.INTERNAL_SERVER_ERROR.message, ErrorType.INTERNAL_SERVER_ERROR.errorCode);
     }
   }
 

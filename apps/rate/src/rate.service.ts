@@ -66,8 +66,8 @@ export class RateService {
 
       return response.data;
     } catch (error) {
-      this.loggingService.error(`Error fetching crypto rates: ${error.message}`);
-      throw new ServerError(ErrorType.GENERAL_ERROR.message, ErrorType.GENERAL_ERROR.errorCode);
+      this.loggingService.error(`Error fetching crypto rates: ${error}`);
+      throw new ServerError(ErrorType.INTERNAL_SERVER_ERROR.message, ErrorType.INTERNAL_SERVER_ERROR.errorCode);
     }
   }
 

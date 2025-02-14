@@ -59,7 +59,6 @@ describe('RateService', (): void => {
   it('should fetch and cache crypto rates if not cached', async (): Promise<void> => {
     const mockRates: CryptoRatesResponse = { bitcoin: { usd: 50000, eur: 46000 } };
 
-    // Wrapping redisService.get with jest.spyOn to simulate cache miss
     const getSpy = jest.spyOn(redisService, 'get').mockResolvedValueOnce(null);
     const setSpy = jest.spyOn(redisService, 'set').mockResolvedValueOnce(undefined);
 
@@ -73,8 +72,8 @@ describe('RateService', (): void => {
   });
 
   it('should throw an error when fetching crypto rates fails', async (): Promise<void> => {
-    redisService.get.mockResolvedValueOnce(null); // Simulate cache miss
-    httpService.get.mockReturnValueOnce(of({ data: null } as AxiosResponse<any>)); // Simulate API returning null data
+    redisService.get.mockResolvedValueOnce(null);
+    httpService.get.mockReturnValueOnce(of({ data: null } as AxiosResponse<any>));
 
     await expect(rateService.getCryptoRates(['bitcoin'])).rejects.toThrow(ServerError);
   });

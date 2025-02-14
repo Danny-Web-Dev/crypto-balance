@@ -11,14 +11,14 @@ import { UserBalances } from '@app/shared/interfaces/balance/user-balance';
 import { of } from 'rxjs';
 import { AxiosResponse } from 'axios';
 
-describe('BalanceService', () => {
+describe('BalanceService', (): void => {
   let balanceService: BalanceService;
   let balanceDataService: jest.Mocked<BalanceDataService>;
   let loggingService: jest.Mocked<LoggingService>;
   let httpService: jest.Mocked<HttpService>;
   let configService: jest.Mocked<ConfigService>;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BalanceService,
@@ -51,9 +51,12 @@ describe('BalanceService', () => {
     httpService = module.get(HttpService);
   });
 
-  it('should return balances for a user', async () => {
+  // Get Balance
+  it('should return balances for a user', async (): Promise<void> => {
     const userId = '1';
-    const mockData: UserBalances = { '1': { bitcoin: { amount: 2, currencies: { usd: 50000, eur: 46000, gbp: 39000 } } } };
+    const mockData: UserBalances = {
+      '1': { bitcoin: { amount: 2, currencies: { usd: 50000, eur: 46000, gbp: 39000 } } },
+    };
     balanceDataService.readData.mockResolvedValue(mockData);
 
     const result = await balanceService.getBalances(userId);
@@ -62,7 +65,8 @@ describe('BalanceService', () => {
     expect(jest.spyOn(balanceDataService, 'readData')).toHaveBeenCalled();
   });
 
-  it('should add balance for a user and fetch exchange rates', async () => {
+  // Add balance
+  it('should add balance for a user and fetch exchange rates', async (): Promise<void> => {
     const userId = '1';
     const asset = 'bitcoin';
     const amount = 2;
@@ -83,14 +87,15 @@ describe('BalanceService', () => {
     );
   });
 
-  it('should remove balance for a user', async () => {
+  // Remove Balance
+  it('should remove balance for a user', async (): Promise<void> => {
     const userId = '1';
     const asset = 'bitcoin';
     const mockData: UserBalances = {
       '1': {
         bitcoin: {
           amount: 2,
-          currencies: { usd: 50000, eur: 45000, gbp: 40000 }, // Add eur and gbp here
+          currencies: { usd: 50000, eur: 45000, gbp: 40000 },
         },
       },
     };
@@ -104,18 +109,19 @@ describe('BalanceService', () => {
     expect(jest.spyOn(balanceDataService, 'writeData')).toHaveBeenCalled();
   });
 
-  it('should throw error when removing balance for a non-existent user', async () => {
+  it('should throw error when removing balance for a non-existent user', async (): Promise<void> => {
     const userId = '1';
     const asset = 'bitcoin';
 
-    balanceDataService.readData.mockResolvedValue({}); // No user data
+    balanceDataService.readData.mockResolvedValue({});
 
-    await expect(balanceService.removeBalance(userId, asset)).rejects.toThrowError(
+    await expect(balanceService.removeBalance(userId, asset)).rejects.toThrow(
       new ServerError(ErrorType.USER_DOES_NOT_EXIST.message, ErrorType.USER_DOES_NOT_EXIST.errorCode),
     );
   });
 
-  it('should update balance for a user', async () => {
+  // Update balance
+  it('should update balance for a user', async (): Promise<void> => {
     const userId = '1';
     const asset = 'bitcoin';
     const amount = 5;
@@ -140,18 +146,19 @@ describe('BalanceService', () => {
     );
   });
 
-  it('should throw error when updating non-existent asset', async () => {
+  it('should throw error when updating non-existent asset', async (): Promise<void> => {
     const userId = '1';
     const asset = 'bitcoin';
     const amount = 5;
     balanceDataService.readData.mockResolvedValue({ '1': {} });
 
-    await expect(balanceService.updateBalance(userId, asset, amount)).rejects.toThrowError(
+    await expect(balanceService.updateBalance(userId, asset, amount)).rejects.toThrow(
       new ServerError(ErrorType.ASSET_NOT_FOUND.message, ErrorType.ASSET_NOT_FOUND.errorCode),
     );
   });
 
-  it('should fetch coin rates', async () => {
+  // Fetch coin rates
+  it('should fetch coin rates', async (): Promise<void> => {
     const asset = 'bitcoin';
     const mockRates = { usd: 50000, eur: 46000, gbp: 39000 };
     httpService.get.mockReturnValueOnce(of({ data: { data: { bitcoin: mockRates } } } as AxiosResponse<any>));
@@ -163,21 +170,23 @@ describe('BalanceService', () => {
     expect(jest.spyOn(httpService, 'get')).toHaveBeenCalled();
   });
 
-  it('should handle error when fetching coin rates', async () => {
+  it('should handle error when fetching coin rates', async (): Promise<void> => {
     const asset = 'bitcoin';
     httpService.get.mockReturnValueOnce(of({ data: null } as AxiosResponse<any>));
 
     await expect(balanceService['getCoinRates'](asset)).rejects.toThrow(ServerError);
   });
 
-  it('should clean empty balance users', () => {
+  // Balance data
+  it('should clean empty balance users', (): void => {
     const data: UserBalances = { '1': {} };
     balanceService['cleanEmptyBalanceUser'](data, '1');
 
     expect(data).toEqual({});
   });
 
-  it('should validate data successfully', () => {
+  // data validations
+  it('should validate data successfully', (): void => {
     const data: UserBalances = {
       '1': {
         bitcoin: {
@@ -190,10 +199,10 @@ describe('BalanceService', () => {
     expect(() => balanceService['validateData'](data, '1', 'bitcoin')).not.toThrow();
   });
 
-  it('should throw error when validating non-existent user', () => {
+  it('should throw error when validating non-existent user', (): void => {
     const data: UserBalances = {};
 
-    expect(() => balanceService['validateData'](data, '1', 'bitcoin')).toThrowError(
+    expect(() => balanceService['validateData'](data, '1', 'bitcoin')).toThrow(
       new ServerError(ErrorType.USER_DOES_NOT_EXIST.message, ErrorType.USER_DOES_NOT_EXIST.errorCode),
     );
   });

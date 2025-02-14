@@ -37,6 +37,8 @@ Library tools:
     - **Responsibilities**: Manages integration with CoinGecko api.
     - **APIs**:
         - `GET /coin-ids?ids={assets}` - Retrieve coins data.
+    - **CRON**
+      - If there are users with balance, a cron job will refresh the currency rates every 30 minutes. 
 
 ## Getting Started
 

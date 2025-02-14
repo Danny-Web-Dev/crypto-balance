@@ -45,10 +45,12 @@ Library tools:
 ### Prerequisites
 
 - **Node.js**: Ensure Node.js is installed on your machine. \*\* Do not forget to run npm install.
-
+- **Reds**: Please make sure you have a running redis instance for caching.
+  - The easiest way is to run a docker container with the following command:   
+  ```docker run --name redis -p 6379:6379 -d redis```
 ### PostMan collection
 
-For your convenience I have attached a postman collection json to this project at root folder of the project. 
+For your convenience I have attached a postman collection json to this project at root folder of the project.  
 import it to postman and play around.
 
 ### Unit tests

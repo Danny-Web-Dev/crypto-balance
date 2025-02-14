@@ -49,6 +49,10 @@ Library tools:
 For your convenience I have attached a postman collection json to this project at root folder of the project. 
 import it to postman and play around.
 
+### Unit tests
+
+The project has Jest unit test tool, run 'npm test' to run the unit tests suites.
+
 ### Installation
 
 1. **Clone the Repository**

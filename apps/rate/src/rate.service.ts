@@ -11,7 +11,6 @@ import { RedisService } from '@app/shared/redis/redis.service';
 
 @Injectable()
 export class RateService {
-
   private url: string | undefined;
 
   constructor(
@@ -45,9 +44,9 @@ export class RateService {
   private async getCachedRates(cacheKey: string): Promise<CryptoRatesResponse | null> {
     try {
       const cachedData = await this.redisService.get(cacheKey);
-      return cachedData ? JSON.parse(cachedData) as CryptoRatesResponse : null;
+      return cachedData ? (JSON.parse(cachedData) as CryptoRatesResponse) : null;
     } catch (error) {
-      this.loggingService.warn(`Failed to retrieve cache for ${cacheKey}: ${error.message}`);
+      this.loggingService.warn(`Failed to retrieve cache for ${cacheKey}: ${error}`);
       return null;
     }
   }
@@ -57,18 +56,20 @@ export class RateService {
 
     try {
       const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
-        this.httpService.get<CryptoRatesResponse>(url)
+        this.httpService.get<CryptoRatesResponse>(url),
       );
 
-      if (response.data) {
-        await this.redisService.set(cacheKey, JSON.stringify(response.data), 300);
+      if (!response.data) {
+        this.loggingService.error(`No data returned from API, url ${url}`);
+        throw new ServerError(ErrorType.INTERNAL_SERVER_ERROR.message, ErrorType.INTERNAL_SERVER_ERROR.errorCode);
       }
+
+      await this.redisService.set(cacheKey, JSON.stringify(response.data), 300);
 
       return response.data;
     } catch (error) {
-      this.loggingService.error(`Error fetching crypto rates: ${error}`);
+      this.loggingService.error(`Error fetching crypto rates for ${cryptoIds.join(', ')}: ${error}`);
       throw new ServerError(ErrorType.INTERNAL_SERVER_ERROR.message, ErrorType.INTERNAL_SERVER_ERROR.errorCode);
     }
   }
-
 }

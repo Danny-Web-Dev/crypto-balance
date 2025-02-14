@@ -68,7 +68,7 @@ export class BalanceService {
   }
 
   private async getCoinRates(asset: string): Promise<Currencies> {
-    const url = `${this.configService.get<string>('RATES_HOST')}/rates/coin-ids?ids=${asset}`;
+    const url = `${this.configService.get<string>('RATES_HOST')}/coin-ids?ids=${asset}`;
     try {
       const response: AxiosResponse<CryptoRatesResponse> = await lastValueFrom(
         this.httpService.get<CryptoRatesResponse>(url),

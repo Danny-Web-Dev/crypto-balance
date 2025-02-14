@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put } from '@nestj
 import { BalanceService } from './balance.service';
 import { Balance } from '@app/shared/interfaces/balance/balance';
 
-@Controller('balances')
+@Controller()
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}
 
@@ -11,7 +11,7 @@ export class BalanceController {
     return await this.balanceService.getBalances(userId);
   }
 
-  @Post()
+  @Post('add')
   public async add(
     @Headers('x-user-id') userId: string,
     @Body() body: { asset: string; amount: number },

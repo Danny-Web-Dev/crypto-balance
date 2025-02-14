@@ -1,0 +1,189 @@
+{
+	"info": {
+		"_postman_id": "53e6ac1c-c9e3-40a8-a580-a68a29c1bd19",
+		"name": "crypto-balance",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24141102"
+	},
+	"item": [
+		{
+			"name": "rate-service",
+			"item": [
+				{
+					"name": "coin-ids",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{rateUrl}}/coin-ids?ids=bitcoin",
+							"host": [
+								"{{rateUrl}}"
+							],
+							"path": [
+								"coin-ids"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "bitcoin"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "balance-service",
+			"item": [
+				{
+					"name": "Add Balance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"asset\": \"tether\",\n    \"amount\": 0.5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{balanceUrl}}/add",
+							"host": [
+								"{{balanceUrl}}"
+							],
+							"path": [
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Balance",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-user-id",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{balanceUrl}}/tether",
+							"host": [
+								"{{balanceUrl}}"
+							],
+							"path": [
+								"tether"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Balance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-user-id",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"asset\": \"bitcoin\",\n    \"amount\": 0.1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{balanceUrl}}/update",
+							"host": [
+								"{{balanceUrl}}"
+							],
+							"path": [
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Balances",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-user-id",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{balanceUrl}}",
+							"host": [
+								"{{balanceUrl}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "balanceUrl",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "rateUrl",
+			"value": "http://localhost:3002",
+			"type": "string"
+		}
+	]
+}

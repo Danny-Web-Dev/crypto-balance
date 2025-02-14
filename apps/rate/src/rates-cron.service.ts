@@ -37,7 +37,7 @@ export class RatesCronService {
       await this.balanceDataService.writeData(data);
       this.loggingService.log('Updated asset rates successfully with the latest crypto rates.');
     } catch (error) {
-      this.loggingService.error(`Cron job failed: ${error.message}`);
+      this.loggingService.error(`Cron job failed: ${error}`);
     }
   }
 

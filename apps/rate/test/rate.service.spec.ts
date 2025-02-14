@@ -45,19 +45,19 @@ describe('RateService', (): void => {
 
   // Get crypto rates - cached
   it('should return cached crypto rates', async (): Promise<void> => {
-    const mockRates: CryptoRatesResponse = { BTC: { usd: 50000, eur: 46000 } };
+    const mockRates: CryptoRatesResponse = { bitcoin: { usd: 50000, eur: 46000 } };
 
     const getSpy = jest.spyOn(redisService, 'get').mockResolvedValueOnce(JSON.stringify(mockRates));
 
-    const result = await rateService.getCryptoRates(['BTC']);
+    const result = await rateService.getCryptoRates(['bitcoin']);
 
     expect(result).toEqual(mockRates);
-    expect(getSpy).toHaveBeenCalledWith('crypto_rates:BTC');
+    expect(getSpy).toHaveBeenCalledWith('crypto_rates:bitcoin');
   });
 
   // Get crypto rates - fresh fetch
   it('should fetch and cache crypto rates if not cached', async (): Promise<void> => {
-    const mockRates: CryptoRatesResponse = { BTC: { usd: 50000, eur: 46000 } };
+    const mockRates: CryptoRatesResponse = { bitcoin: { usd: 50000, eur: 46000 } };
 
     // Wrapping redisService.get with jest.spyOn to simulate cache miss
     const getSpy = jest.spyOn(redisService, 'get').mockResolvedValueOnce(null);
@@ -65,26 +65,26 @@ describe('RateService', (): void => {
 
     httpService.get.mockReturnValueOnce(of({ data: mockRates } as AxiosResponse));
 
-    const result = await rateService.getCryptoRates(['BTC']);
+    const result = await rateService.getCryptoRates(['bitcoin']);
 
     expect(result).toEqual(mockRates);
-    expect(getSpy).toHaveBeenCalledWith('crypto_rates:BTC');
-    expect(setSpy).toHaveBeenCalledWith('crypto_rates:BTC', JSON.stringify(mockRates), 300);
+    expect(getSpy).toHaveBeenCalledWith('crypto_rates:bitcoin');
+    expect(setSpy).toHaveBeenCalledWith('crypto_rates:bitcoin', JSON.stringify(mockRates), 300);
   });
 
   it('should throw an error when fetching crypto rates fails', async (): Promise<void> => {
     redisService.get.mockResolvedValueOnce(null); // Simulate cache miss
     httpService.get.mockReturnValueOnce(of({ data: null } as AxiosResponse<any>)); // Simulate API returning null data
 
-    await expect(rateService.getCryptoRates(['BTC'])).rejects.toThrow(ServerError);
+    await expect(rateService.getCryptoRates(['bitcoin'])).rejects.toThrow(ServerError);
   });
 
   it('should handle cache retrieval failure gracefully', async (): Promise<void> => {
     redisService.get.mockRejectedValueOnce(new Error('Cache error'));
-    httpService.get.mockReturnValueOnce(of({ data: { BTC: { usd: 50000 } } } as AxiosResponse));
+    httpService.get.mockReturnValueOnce(of({ data: { bitcoin: { usd: 50000 } } } as AxiosResponse));
 
-    const result = await rateService.getCryptoRates(['BTC']);
+    const result = await rateService.getCryptoRates(['bitcoin']);
 
-    expect(result).toEqual({ BTC: { usd: 50000 } });
+    expect(result).toEqual({ bitcoin: { usd: 50000 } });
   });
 });
